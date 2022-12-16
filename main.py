@@ -141,9 +141,11 @@ def main():
             else:
                 # draw a white rectangle for a passable space
                 pygame.draw.rect(window, (255, 255, 255), (j * CELL_SIZE, i * CELL_SIZE, CELL_SIZE, CELL_SIZE))
-                rect = pygame.Rect(start,  PATH_SIZE)
-                rect = pygame.Rect(end, PATH_SIZE)
-                pygame.draw.rect(window, (255, 0, 0), rect)
+
+                if (i, j) in path:
+                    x = i * CELL_SIZE
+                    y = j * CELL_SIZE
+                    pygame.draw.rect(window, (255,0,0), (x, y, CELL_SIZE, CELL_SIZE))
 
 
 
@@ -157,8 +159,7 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
 
-    path = astar(maze, start, end)
-    print(path)
+
 
 
 
