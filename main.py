@@ -3,12 +3,19 @@ import pygame as pygame
 
 
 class Node():
-    """A node class for A* Pathfinding"""
+
+    #Opretter node class til A* algoritme pathfinding
 
     def __init__(self, parent=None, position=None):
+        #Parent node er den forrige node, altså den tættere på start node
         self.parent = parent
         self.position = position
 
+        #Tre værdier for node:
+        #g = afstand fra node til start
+        #h = estimeret afstand til slut. Der skal bruges pythagoras til dette
+        #f = g + h
+        #Skal beregnes hver gang en ny node oprettes!!!
         self.g = 0
         self.h = 0
         self.f = 0
@@ -18,7 +25,7 @@ class Node():
 
 
 def astar(maze, start, end):
-    """Returns a list of tuples as a path from the given start to the given end in the given maze"""
+
 
     # Create start and end node
     start_node = Node(None, start)
@@ -114,7 +121,7 @@ def main():
             [0, 0, 0, 0, 1, 0, 0, 0, 0, 0]]
 
     start = (0, 0)
-    end = (8, 7)
+    end = (1, 6)
 
     path = astar(maze, start, end)
     print(path)
