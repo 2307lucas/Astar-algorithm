@@ -1,21 +1,16 @@
-import pygame as pygame
+from warnings import warn
+import heapq
 
 
-
-class Node():
-
-    #Opretter node class til A* algoritme pathfinding
+class Node:
+    """
+    A node class for A* Pathfinding
+    """
 
     def __init__(self, parent=None, position=None):
-        #Parent node er den forrige node, altså den tættere på start node
         self.parent = parent
         self.position = position
 
-        #Tre værdier for node:
-        #g = afstand fra node til start
-        #h = estimeret afstand til slut. Der skal bruges pythagoras til dette
-        #f = g + h
-        #Skal beregnes hver gang en ny node oprettes!!!
         self.g = 0
         self.h = 0
         self.f = 0
@@ -23,9 +18,35 @@ class Node():
     def __eq__(self, other):
         return self.position == other.position
 
+    def __repr__(self):
+        return f"{self.position} - g: {self.g} h: {self.h} f: {self.f}"
 
-def astar(maze, start, end):
+    # defining less than for purposes of heap queue
+    def __lt__(self, other):
+        return self.f < other.f
 
+    # defining greater than for purposes of heap queue
+    def __gt__(self, other):
+        return self.f > other.f
+
+
+def return_path(current_node):
+    path = []
+    current = current_node
+    while current is not None:
+        path.append(current.position)
+        current = current.parent
+    return path[::-1]  # Return reversed path
+
+
+def astar(maze, start, end, allow_diagonal_movement=True):
+    """
+    Returns a list of tuples as a path from the given start to the given end in the given maze
+    :param maze:
+    :param start:
+    :param end:
+    :return:
+    """
 
     # Create start and end node
     start_node = Node(None, start)
@@ -37,42 +58,48 @@ def astar(maze, start, end):
     open_list = []
     closed_list = []
 
-    # Add the start node
-    open_list.append(start_node)
+    # Heapify the open_list and Add the start node
+    heapq.heapify(open_list)
+    heapq.heappush(open_list, start_node)
+
+    # Adding a stop condition
+    outer_iterations = 0
+    max_iterations = (len(maze[0]) * 400)
+
+    # what squares do we search
+    adjacent_squares = ((0, -1), (0, 1), (-1, 0), (1, 0),)
+    if allow_diagonal_movement:
+        adjacent_squares = ((0, -1), (0, 1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1),)
 
     # Loop until you find the end
     while len(open_list) > 0:
+        outer_iterations += 1
 
-        # Get the current node
-        current_node = open_list[0]
-        current_index = 0
-        for index, item in enumerate(open_list):
-            if item.f < current_node.f:
-                current_node = item
-                current_index = index
+        if outer_iterations > max_iterations:
+            # if we hit this point return the path such as it is
+            # it will not contain the destination
+            warn("giving up on pathfinding too many iterations")
+            return return_path(current_node)
 
-        # Pop current off open list, add to closed list
-        open_list.pop(current_index)
+            # Get the current node
+        current_node = heapq.heappop(open_list)
         closed_list.append(current_node)
 
         # Found the goal
         if current_node == end_node:
-            path = []
-            current = current_node
-            while current is not None:
-                path.append(current.position)
-                current = current.parent
-            return path[::-1] # Return reversed path
+            return return_path(current_node)
 
         # Generate children
         children = []
-        for new_position in [(0, -1), (0, 1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1)]: # Adjacent squares
+
+        for new_position in adjacent_squares:  # Adjacent squares
 
             # Get node position
             node_position = (current_node.position[0] + new_position[0], current_node.position[1] + new_position[1])
 
             # Make sure within range
-            if node_position[0] > (len(maze) - 1) or node_position[0] < 0 or node_position[1] > (len(maze[len(maze)-1]) -1) or node_position[1] < 0:
+            if node_position[0] > (len(maze) - 1) or node_position[0] < 0 or node_position[1] > (
+                    len(maze[len(maze) - 1]) - 1) or node_position[1] < 0:
                 continue
 
             # Make sure walkable terrain
@@ -87,88 +114,75 @@ def astar(maze, start, end):
 
         # Loop through children
         for child in children:
-
             # Child is on the closed list
-            for closed_child in closed_list:
-                if child == closed_child:
-                    continue
+            if len([closed_child for closed_child in closed_list if closed_child == child]) > 0:
+                continue
 
             # Create the f, g, and h values
-            child.g = current_node.g + 1
-            child.h = ((child.position[0] - end_node.position[0]) ** 2) + ((child.position[1] - end_node.position[1]) ** 2)
+            child.g = current_node.g + (((child.position[0] - child.parent.position[0]) ** 2) + (
+                        (child.position[1] - child.parent.position[1]) ** 2)) ** 0.5
+            child.h = (((child.position[0] - end_node.position[0]) ** 2) + (
+                        (child.position[1] - end_node.position[1]) ** 2)) ** 0.5
             child.f = child.g + child.h
 
             # Child is already in the open list
-            for open_node in open_list:
-                if child == open_node and child.g > open_node.g:
-                    continue
+            if child in open_list:
+                idx = open_list.index(child)
+                if child.g < open_list[idx].g:
+                    # update the node in the open list
+                    open_list[idx].g = child.g
+                    open_list[idx].f = child.f
+                    open_list[idx].h = child.h
+            else:
+                # Add the child to the open list
+                heapq.heappush(open_list, child)
 
             # Add the child to the open list
-            open_list.append(child)
+            heapq.heappush(open_list, child)
+
+    warn("Couldn't get a path to destination")
+    return None
 
 
-def main():
-
-    maze = [[0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 1, 0, 0, 0, 0, 0]]
+def example(print_maze=True):
+    maze = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ],
+            [0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, ],
+            [0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, ],
+            [0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, ],
+            [0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, ],
+            [0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, ],
+            [0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, ],
+            [0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, ],
+            [0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0, ],
+            [0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, ],
+            [0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, ],
+            [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, ],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, ]]
 
     start = (0, 0)
-    end = (1, 6)
+    end = (0,16)
 
     path = astar(maze, start, end)
+
+    if print_maze:
+        for step in path:
+            maze[step[0]][step[1]] = 2
+
+        for row in maze:
+            line = []
+            for col in row:
+                if col == 1:
+                    line.append("\u2588")
+                elif col == 0:
+                    line.append(" ")
+                elif col == 2:
+                    line.append(".")
+            print("".join(line))
+
     print(path)
-    # define the window size
-    WINDOW_SIZE = (500, 500)
-
-    # create the window
-    window = pygame.display.set_mode(WINDOW_SIZE)
-
-    # set the background color to white
-    window.fill((255, 255, 255))
-    # define the size of each cell in the maze
-    CELL_SIZE = 50
-
-    # draw the maze
-    for i in range(len(maze)):
-        for j in range(len(maze[0])):
-            if maze[i][j] == 1:
-                # draw a black rectangle for a wall
-                pygame.draw.rect(window, (0, 0, 0), (j * CELL_SIZE, i * CELL_SIZE, CELL_SIZE, CELL_SIZE))
-            else:
-                # draw a white rectangle for a passable space
-                pygame.draw.rect(window, (255, 255, 255), (j * CELL_SIZE, i * CELL_SIZE, CELL_SIZE, CELL_SIZE))
-
-                if (i, j) in path:
-                    #Calculate the x and y positions of the cell for use in drawing path cell
-                    x = j * CELL_SIZE
-                    y = i * CELL_SIZE
-                    pygame.draw.rect(window, (255,0,0), (x, y, CELL_SIZE, CELL_SIZE))
-
-
-
-
-    # update the display
-    pygame.display.update()
-
-    # run the Pygame loop
-    running = True
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-
-
-
-
 
 if __name__ == '__main__':
-    main()
-
+    example()
