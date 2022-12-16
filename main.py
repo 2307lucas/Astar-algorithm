@@ -1,3 +1,7 @@
+import pygame as pygame
+
+
+
 class Node():
     """A node class for A* Pathfinding"""
 
@@ -105,7 +109,7 @@ def main():
             [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
 
@@ -114,7 +118,50 @@ def main():
 
     path = astar(maze, start, end)
     print(path)
+    # define the window size
+    WINDOW_SIZE = (500, 500)
+
+    # create the window
+    window = pygame.display.set_mode(WINDOW_SIZE)
+
+    # set the background color to white
+    window.fill((255, 255, 255))
+    width = 5
+    # define the size of each cell in the maze
+    CELL_SIZE = 50
+    PATH_SIZE = (50, 50)
+
+
+    # draw the maze
+    for i in range(len(maze)):
+        for j in range(len(maze[0])):
+            if maze[i][j] == 1:
+                # draw a black rectangle for a wall
+                pygame.draw.rect(window, (0, 0, 0), (j * CELL_SIZE, i * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+            else:
+                # draw a white rectangle for a passable space
+                pygame.draw.rect(window, (255, 255, 255), (j * CELL_SIZE, i * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+                rect = pygame.Rect(start,  PATH_SIZE)
+                rect = pygame.Rect(end, PATH_SIZE)
+                pygame.draw.rect(window, (255, 0, 0), rect)
+
+
+
+    # update the display
+    pygame.display.update()
+
+    # run the Pygame loop
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+
+    path = astar(maze, start, end)
+    print(path)
+
 
 
 if __name__ == '__main__':
     main()
+
