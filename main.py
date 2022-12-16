@@ -143,6 +143,7 @@ def main():
                 pygame.draw.rect(window, (255, 255, 255), (j * CELL_SIZE, i * CELL_SIZE, CELL_SIZE, CELL_SIZE))
 
                 if (i, j) in path:
+                    #Calculate the x and y positions of the cell for use in drawing path cell
                     x = i * CELL_SIZE
                     y = j * CELL_SIZE
                     pygame.draw.rect(window, (255,0,0), (x, y, CELL_SIZE, CELL_SIZE))
