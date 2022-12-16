@@ -1,5 +1,6 @@
 from warnings import warn
 import heapq
+import pygame
 
 
 class Node:
@@ -183,6 +184,46 @@ def example(print_maze=True):
             print("".join(line))
 
     print(path)
+    # define the window size
+    WINDOW_SIZE = (1000, 1000)
+
+    # create the window
+    window = pygame.display.set_mode(WINDOW_SIZE)
+
+    # set the background color to white
+    window.fill((255, 255, 255))
+    # define the size of each cell in the maze
+    CELL_SIZE = 25
+
+    # draw the maze
+    for i in range(len(maze)):
+        for j in range(len(maze[0])):
+            if maze[i][j] == 1:
+                # draw a black rectangle for a wall
+                pygame.draw.rect(window, (0, 0, 0), (j * CELL_SIZE, i * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+            else:
+                # draw a white rectangle for a passable space
+                pygame.draw.rect(window, (255, 255, 255), (j * CELL_SIZE, i * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+
+                if (i, j) in path:
+                    #Calculate the x and y positions of the cell for use in drawing path cell
+                    x = j * CELL_SIZE
+                    y = i * CELL_SIZE
+                    pygame.draw.rect(window, (255,0,0), (x, y, CELL_SIZE, CELL_SIZE))
+
+
+
+
+    # update the display
+    pygame.display.update()
+
+    # run the Pygame loop
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+
 
 if __name__ == '__main__':
     example()
