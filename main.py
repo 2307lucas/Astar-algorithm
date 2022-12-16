@@ -106,15 +106,15 @@ def main():
             [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
+            [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 1, 0, 0, 0, 0, 0]]
 
     start = (0, 0)
-    end = (7, 6)
+    end = (8, 7)
 
     path = astar(maze, start, end)
     print(path)
@@ -126,11 +126,8 @@ def main():
 
     # set the background color to white
     window.fill((255, 255, 255))
-    width = 5
     # define the size of each cell in the maze
     CELL_SIZE = 50
-    PATH_SIZE = (50, 50)
-
 
     # draw the maze
     for i in range(len(maze)):
@@ -144,8 +141,8 @@ def main():
 
                 if (i, j) in path:
                     #Calculate the x and y positions of the cell for use in drawing path cell
-                    x = i * CELL_SIZE
-                    y = j * CELL_SIZE
+                    x = j * CELL_SIZE
+                    y = i * CELL_SIZE
                     pygame.draw.rect(window, (255,0,0), (x, y, CELL_SIZE, CELL_SIZE))
 
 
