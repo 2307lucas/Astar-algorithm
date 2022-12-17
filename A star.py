@@ -78,7 +78,7 @@ def astar(maze, start, end, allow_diagonal_movement=True):
 
     # Tilføjet en stop variabel
     outer_iterations = 0
-    max_iterations = (len(maze[0]) * 400)
+    max_iterations = 100000
 
     # Her bliver der defineret to variabler der svarer til tuples hvor koordinaterne svarer til:
     # Højre, venstre, top og bund
