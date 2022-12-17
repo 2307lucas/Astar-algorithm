@@ -68,11 +68,11 @@ def astar(maze, start, end, allow_diagonal_movement=True):
     end_node = Node(None, end)
     end_node.g = end_node.h = end_node.f = 0
 
-    # Initialize både open og closed list
+    # Initialiser både open og closed list
     open_list = []
     closed_list = []
 
-    # Her bliver der heapify open_list og added start_node
+    # Her anvendes der heapify på open_list og added start_node
     heapq.heapify(open_list)
     heapq.heappush(open_list, start_node)
 
@@ -130,7 +130,7 @@ def astar(maze, start, end, allow_diagonal_movement=True):
             # Append
             children.append(new_node)
 
-        # Loop through children
+        # Loop gennem children
         for child in children:
             # Child er på closed_list så vil den fortsætte.
             if len([closed_child for closed_child in closed_list if closed_child == child]) > 0:
