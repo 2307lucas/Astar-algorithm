@@ -22,7 +22,7 @@ class Node:
         self.f = 0
 
 
-# Her bliver der kaldt to objekter der bliver sammenlignet hvor der bliver returned true hvis de er og falls hvis ikke de er equal.
+# Tjekker for position af node, sammenlignet med anden node
     def __eq__(self, other):
         return self.position == other.position
 
