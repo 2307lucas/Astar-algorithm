@@ -22,7 +22,7 @@ class Node:
         self.f = 0
 
 
-# Tjekker for position af node, sammenlignet med anden node
+# Tjekker for position af node, sammenlignet med anden node position
     def __eq__(self, other):
         return self.position == other.position
 
