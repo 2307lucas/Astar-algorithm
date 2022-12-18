@@ -133,7 +133,8 @@ def astar(maze, start, end, allow_diagonal_movement=True):
                 continue
 
             # Dannelse af f, g, og h variabler.
-            child.g = current_node.g + 1
+            child.g = current_node.g + math.sqrt(((child.position[0] - child.parent.position[0]) ** 2) + (
+                        (child.position[1] - child.parent.position[1]) ** 2))
             child.h = math.sqrt(((child.position[0] - end_node.position[0]) ** 2) + (
                         (child.position[1] - end_node.position[1]) ** 2))
             child.f = child.g + child.h
@@ -174,7 +175,7 @@ def example(print_maze=True):
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, ]]
 
     start = (0, 0)
-    end = (0,16)
+    end = (15,29)
 
     path = astar(maze, start, end)
 
