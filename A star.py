@@ -179,8 +179,7 @@ def example(print_maze=True):
 
     path = astar(maze, start, end)
 
-# Her bliver der lavet en visuel 2D tegning af matricen hvor den illustrerer via en linje.
-    # Hvor der bliver defineret farvekode og printet ruten til sidst af labyrinten.
+# Her bliver der lavet en visuel 2D tegning af matricen hvor den illustrerer via en prikket linje.
     if print_maze:
         for step in path:
             maze[step[0]][step[1]] = 2
@@ -189,6 +188,7 @@ def example(print_maze=True):
             line = []
             for col in row:
                 if col == 1:
+                    #u2588 er en blank firkant som karakter
                     line.append("\u2588")
                 elif col == 0:
                     line.append(" ")
