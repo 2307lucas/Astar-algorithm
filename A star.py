@@ -49,7 +49,7 @@ def return_path(current_node):
     while current is not None:
         path.append(current.position)
         current = current.parent
-    return path[::-1]  # Return reversed path
+    return path[::-1]  # Returnere path baglæns
 
 
 def astar(maze, start, end, allow_diagonal_movement=True):
