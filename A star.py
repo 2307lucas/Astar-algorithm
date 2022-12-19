@@ -74,7 +74,7 @@ def astar(maze, start, end, allow_diagonal_movement=True):
 
     # Tilføjet en stop variabel
     outer_iterations = 0
-    max_iterations = 1000000
+    max_iterations = 10000
 
     # Her bliver der defineret to variabler der svarer til tuples hvor koordinaterne svarer til:
     # Højre, venstre, top og bund
@@ -193,7 +193,7 @@ def example(print_maze=True):
                 elif col == 0:
                     line.append(" ")
                 elif col == 2:
-                    line.append(".")
+                    line.append("*")
             print("".join(line))
 
     print(path)
