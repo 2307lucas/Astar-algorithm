@@ -90,7 +90,7 @@ def astar(maze, start, end, allow_diagonal_movement=True):
         if outer_iterations > max_iterations:
             # Hvis vi rammer dette punkt returner stien, som den er.
             # Den vil ikke indeholde destinationen.
-            warn("giving up on pathfinding too many iterations")
+            warn("Too many iterations for pathfinding")
             return return_path(current_node)
 
             # Hent den aktuelle node.
